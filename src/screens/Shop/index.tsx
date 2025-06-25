@@ -3,10 +3,13 @@ import { styles } from "./styles"
 import { MagicItem } from "../../components/MagicItem"
 import { getMagicItems, MagicItemProps } from "../../services/MagicItensApi"
 import { useEffect, useState } from "react"
+import { ItemDetailsModal } from "../../components/Modals/ItemDetailsModal"
 
 export const Shop = () => {
     const [magicItemList, setMagicItemList] = useState<MagicItemProps[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isItemDetailsModalOpen, setIsItemDetailsModalOpen] = useState<boolean>(false);
+    const [selectedItemIndex, setSelectedItemIndex] = useState<string>('');
 
     useEffect(()=>{
         getMagicItems()
@@ -34,10 +37,18 @@ export const Shop = () => {
                     return (
                         <MagicItem
                             name={item.name}
+                            index={item.index}
+                            setIsItemDetailsModalOpen={setIsItemDetailsModalOpen}
+                            setSelectedItemIndex={setSelectedItemIndex}
                         />
                     )
                 }}
             />
         }
+        {isItemDetailsModalOpen && <ItemDetailsModal
+            selectedItemIndex={selectedItemIndex}
+            isItemDetailsModalOpen={isItemDetailsModalOpen}
+            setIsItemDetailsModalOpen={setIsItemDetailsModalOpen}
+        />}
     </View>
 }
