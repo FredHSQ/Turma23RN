@@ -1,11 +1,14 @@
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, FlatList } from 'react-native'
-import { styles } from './styles';
-import CicleIcon from '../../assets/CircleIcon.png';
+import { FlatList, Text, TextInput, View } from 'react-native';
 import { Button } from '../../components/Button';
-import { skillProps, SkillCard } from '../../components/SkillCard';
+import { SkillCard, skillProps } from '../../components/SkillCard';
+import { BottomTabsParamList } from '../../routes/BottomTabs';
+import { styles } from './styles';
 
-export const SkillScreen = () => {
+type SkillScreenProps = BottomTabScreenProps<BottomTabsParamList, 'Skill'>;
+
+export const SkillScreen = ({ navigation }: SkillScreenProps) => {
   const [skills, setSkills] = useState<skillProps[]>([]);
   const [newSkill, setNewSkill] = useState<string>('');
 
@@ -36,7 +39,7 @@ export const SkillScreen = () => {
         keyExtractor={item => item.id}
         renderItem={({ item }) => {
           return (
-            <SkillCard skill={item}/>
+            <SkillCard onPress={()=>navigation.navigate('Shop')} skill={item}/>
         )}}
       />
     </View>

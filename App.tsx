@@ -1,10 +1,9 @@
 import React from 'react';
-import { SkillScreen } from './src/screens/SkillScreen';
-
+import { Routes } from './src/routes';
 
 const App = () => {
   return (
-    <SkillScreen />
+    <Routes />
   )
 }
 
