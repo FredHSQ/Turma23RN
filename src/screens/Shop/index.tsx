@@ -2,8 +2,9 @@ import { View, FlatList, Text, ActivityIndicator } from "react-native"
 import { styles } from "./styles"
 import { MagicItem } from "../../components/MagicItem"
 import { getMagicItems, MagicItemProps } from "../../services/MagicItensApi"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { ItemDetailsModal } from "../../components/Modals/ItemDetailsModal"
+import { CartContext } from "../../context"
 
 export const Shop = () => {
     const [magicItemList, setMagicItemList] = useState<MagicItemProps[]>([]);

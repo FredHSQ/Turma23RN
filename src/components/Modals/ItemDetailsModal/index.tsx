@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Modal, View, Text, ActivityIndicator, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { styles } from "./styles";
-import { getMagicItemDetailsResponse, getMagicItemsDetails } from "../../../services/MagicItensApi";
+import { getMagicItemDetailsResponse, getMagicItemsDetails, MagicItemProps } from "../../../services/MagicItensApi";
 import CloseIcon from '../../../assets/CloseIcon.png';
+import { CartContext } from "../../../context";
+import { Button } from "../../Button";
 
 interface ItemDetailsModal {
     isItemDetailsModalOpen: boolean,
     setIsItemDetailsModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    selectedItemIndex: string
+    selectedItemIndex: string,
+    isCart?: boolean
 }
 
-export const ItemDetailsModal = ({ isItemDetailsModalOpen, setIsItemDetailsModalOpen, selectedItemIndex } : ItemDetailsModal) => {
+export const ItemDetailsModal = ({ isCart, isItemDetailsModalOpen, setIsItemDetailsModalOpen, selectedItemIndex } : ItemDetailsModal) => {
     const [itemDetails, setItemDetails] = useState<getMagicItemDetailsResponse>({
         index: "",
         name: "",
@@ -31,6 +34,7 @@ export const ItemDetailsModal = ({ isItemDetailsModalOpen, setIsItemDetailsModal
         desc: [""]
     });
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const { addItemToCart, removeItemFromCart } = useContext(CartContext);
 
     useEffect(()=>{
         getMagicItemsDetails(selectedItemIndex)
@@ -43,7 +47,16 @@ export const ItemDetailsModal = ({ isItemDetailsModalOpen, setIsItemDetailsModal
             .finally(()=> {
                 setIsLoading(false)
             })
-    }, [])
+    }, []);
+
+    function addSelectedItemToCard () {
+        const magicItem: MagicItemProps = {
+            name: itemDetails.name,
+            index: itemDetails.index
+        }
+        
+        addItemToCart(magicItem)
+    }
 
     return (
         <Modal
@@ -56,20 +69,20 @@ export const ItemDetailsModal = ({ isItemDetailsModalOpen, setIsItemDetailsModal
         >
             <View style={styles.modal}>
                 <View style={styles.modalContainer}>
-				{
-					isLoading ?
+				    {isLoading ?
 						<ActivityIndicator
 							size={"large"}
 						/>
 						:
 						<>
+                            <View style={styles.titleContainer}>
+                                <Text style={styles.title}>{itemDetails.name}</Text>
+                                <TouchableOpacity onPress={() => setIsItemDetailsModalOpen(false)}>
+                                    <Image source={CloseIcon} style={styles.closeIcon} />
+                                </TouchableOpacity>
+                            </View>
 							<ScrollView showsVerticalScrollIndicator={false}>
-								<View style={styles.titleContainer}>
-									<Text style={styles.title}>{itemDetails.name}</Text>
-									<TouchableOpacity onPress={() => setIsItemDetailsModalOpen(false)}>
-										<Image source={CloseIcon} style={styles.closeIcon} />
-									</TouchableOpacity>
-								</View>
+								
 								<View style={styles.firstStatsContainer}>
 									<View style={styles.firstStats}>
 										<Text style={styles.textTitle}>Rarity: </Text>
@@ -79,10 +92,6 @@ export const ItemDetailsModal = ({ isItemDetailsModalOpen, setIsItemDetailsModal
 										<Text style={styles.textTitle}>Type: </Text>
 										<Text style={styles.textTitle}>{itemDetails.equipment_category.name}</Text>
 									</View>
-									{/* <View style={styles.firstStats}>
-										<Text style={styles.textTitle}>Price: </Text>
-										<Text style={styles.textTitle}>R${precoModal},00</Text>
-									</View> */}
 								</View>
                                 {itemDetails.desc &&
                                     <View style={styles.descriptionContainer}>
@@ -92,19 +101,27 @@ export const ItemDetailsModal = ({ isItemDetailsModalOpen, setIsItemDetailsModal
                                         <Text style={styles.text}>
                                             {itemDetails.desc[1]}
                                         </Text>
-                                        {itemDetails.desc.length > 2 && itemDetails.desc.map((description,index) => {
-                                            if (index > 1)
-                                                return <Text style={styles.text}>
-                                                    {description}
-                                                </Text>
-                                        })
+                                        {
+                                            itemDetails.desc.length > 2 && itemDetails.desc.map((description,index) => {
+                                                if (index > 1) {
+                                                    return (
+                                                        <Text style={styles.text}>
+                                                            {description}
+                                                        </Text>
+                                                    )
+                                                }
+                                            })
                                         }
                                     </View>
                                 }
 							</ScrollView>
+                            <Button
+                                text={!isCart ? "Comprar" : "Tirar do carrinho"}
+                                onPress={!isCart ? addSelectedItemToCard : ()=>removeItemFromCart(itemDetails.index)}
+                            />
 						</>
-				}
-			</View>
+				    }
+			    </View>
             </View>
         </Modal>
     );
